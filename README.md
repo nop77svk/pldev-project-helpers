@@ -17,7 +17,7 @@ Before actually using this helper you may need to open the `merge_pldev_prj.sh` 
 
     # set up path to the TortoiseMerge.exe here...
 
-**Depends on:***
+**Depends on:**
 * `bash`, `gawk`, `sed`, `tr` (perhaps from https://www.cygwin.com/),
 * `TortoiseMerge`,
 * `dos2unix` utility for converting DOS/Win EOLNs (CR+LF) to Unix EOLNs (LF).
@@ -43,3 +43,6 @@ PL/SQL Developer does not check for existence of project items on the filesystem
 All project items that do not exist on filesystem, are automatically removed from the (resulting) project file.
 
 All filesystem items (in the whole subtree of your "current directory") are automatically added into the (resulting) project file under the "unsorted" item group.
+
+**Depends on:**
+* `gawk`, `sed`, `egrep`, `tr`, `sort`, `find`, `comm` (perhaps from https://www.cygwin.com/)
