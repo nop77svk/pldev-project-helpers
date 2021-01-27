@@ -18,6 +18,17 @@ TmpPath="${Here}"
 DateTimeToken=$( date +%Y%m%d-%H%M%S )
 RndToken=${DateTimeToken}-${RANDOM}
 
+function decryptProjectFile()
+{
+	local i_input_file=$1
+	local i_output_file="$2"
+
+	cat "${i_input_file}" \
+		| dos2unix \
+		| gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" \
+		> "${i_output_file}"
+}
+
 # -------------------------------------------------------------------------------------------------
 
 # set up path to the TortoiseMerge.exe here...
@@ -50,21 +61,21 @@ if [ -n "${xMine}" ] ; then
 	tmpMine=$( echo "${xMine}.mine.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'mine' ${xMine} -> ${tmpMine}"
-	dos2unix < "${xMine}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpMine}"
+	decryptProjectFile "${xMine}" "${tmpMine}"
 fi
 
 if [ -n "${xTheirs}" ] ; then
 	tmpTheirs=$( echo "${xTheirs}.theirs.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'theirs' ${xTheirs} -> ${tmpTheirs}"
-	dos2unix < "${xTheirs}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpTheirs}"
+	decryptProjectFile "${xTheirs}" "${tmpTheirs}"
 fi
 
 if [ -n "${xBase}" ] ; then
 	tmpBase=$( echo "${xBase}.base.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'base' ${xBase} -> ${tmpBase}"
-	dos2unix < "${xBase}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpBase}"
+	decryptProjectFile "${xBase}" "${tmpBase}"
 else
 	tmpBase=
 fi
