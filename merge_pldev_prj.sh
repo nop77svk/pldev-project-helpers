@@ -47,21 +47,21 @@ else
 fi ; fi
 
 if [ -n "${xMine}" ] ; then
-	tmpMine=$( echo "${xMine}.mine.tmp" | tr ' ' '_' )
+	tmpMine=$( echo "${xMine}.mine.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'mine' ${xMine} -> ${tmpMine}"
 	dos2unix < "${xMine}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpMine}"
 fi
 
 if [ -n "${xTheirs}" ] ; then
-	tmpTheirs=$( echo "${xTheirs}.theirs.tmp" | tr ' ' '_' )
+	tmpTheirs=$( echo "${xTheirs}.theirs.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'theirs' ${xTheirs} -> ${tmpTheirs}"
 	dos2unix < "${xTheirs}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpTheirs}"
 fi
 
 if [ -n "${xBase}" ] ; then
-	tmpBase=$( echo "${xBase}.base.tmp" | tr ' ' '_' )
+	tmpBase=$( echo "${xBase}.base.tmp" | tr ' !@#$%^&*()+' '____________' )
 
 	echo "Preprocessing 'base' ${xBase} -> ${tmpBase}"
 	dos2unix < "${xBase}" | gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" | tr -d '\r' > "${tmpBase}"
@@ -70,7 +70,7 @@ else
 fi
 
 if [ -n "${xResult}" ] ; then
-	tmpResult=$(echo "${xResult}.merged.tmp" | tr ' ' '_' )
+	tmpResult=$(echo "${xResult}.merged.tmp" | tr ' !@#$%^&*()+' '____________' )
 else
 	tmpResult=
 fi
@@ -83,7 +83,7 @@ echo "    merged = ${tmpResult}"
 
 if [ -n "${tmpBase}" ] ; then
 	echo "    (processing branch #1)"
-	"${TortoiseMergeBinary}" "/mine:${tmpMine}" "/theirs:${tmpTheirs}" "/base:${tmpBase}" "/merged:${tmpResult}"
+	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpBase} /merged:${tmpResult}
 else if [ -n "${tmpResult}" ] ; then
 	echo "    (processing branch #2)"
 	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpMine} /merged:${tmpResult}
