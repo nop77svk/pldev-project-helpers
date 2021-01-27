@@ -1,4 +1,4 @@
-# PL/SQL Developer (Allround Automations) project file helper scripts.
+# PL/SQL Developer (Allround Automations) project file helper scripts
 
 The PL/SQL Developer project files come with old-school INI-based structure with rather unfortunate project items assignment to item groups/folders based on positional ID. If an item (SQL/PLSQL script file) gets added/removed anywhere "in/from the middle" of the existing project items, all item groups/folders in the INI file are heavily rewritten with completely different item IDs due to their positional nature.
 
