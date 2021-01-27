@@ -11,7 +11,7 @@ Hence I coded my own few helper scripts around this (and a few others) problem.
 merge_pldev_prj.sh
 ==================
 
-A simple preprocess->process->postprocess shell script for merging the PL/SQL Developer project files. Run it from command line and see its simple usage help.
+A simple preprocess->process->postprocess shell script for merging the PL/SQL Developer project files. Run it, argument-less, from command line and see its simple usage help. I believe it's self-explanatory.
 
 Before actually using this helper you may need to open the `merge_pldev_prj.sh` and edit the line that follows
 
