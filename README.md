@@ -4,7 +4,7 @@ The PL/SQL Developer project files come with old-school INI-based structure with
 
 These project files are not easily manageable under a version control system. The problem is somewhat bearable when only one team member manages a project file - file can be committed anytime, although comparison of differences is perhaps of lesser use.
 
-The problem gets more pronounced when there are multiple maintaners of the project file; and it gets completely unbearable as soon as branching/merging gets introduced to the solution which uses the PL/SQL Developer project files. Merging conflicts in these files could become your daily (or even hourly) routine.
+The problem gets more pronounced when there are multiple maintaners of the project file; and it gets completely unbearable as soon as branching/merging gets introduced to the solution that uses the PL/SQL Developer project files. Merging conflicts in these files could become your daily (or even hourly) nightmare.
 
 Hence I coded my own few helper scripts around this (and a few others) problem.
 
