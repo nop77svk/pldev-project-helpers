@@ -60,127 +60,133 @@ TortoiseMergeBinary=tmerge.exe
 
 function set_arg()
 {
-	xScriptArg="$1"
-	xOptionToTest="$2"
+	i_script_arg="$1"
+	i_option_to_test="$2"
 	if bash__SupportsVariableReferences ; then
 		declare -n oResult=$3
 	fi
 
-	if [[ "${xScriptArg}" == "--${xOptionToTest}="* ]] ; then
-		lScriptArgWoOptionToTest="${xScriptArg#--${xOptionToTest}=}"
+	if [[ "${i_script_arg}" == "--${i_option_to_test}="* ]] ; then
+		l_script_arg_wo_option_to_test="${i_script_arg#--${i_option_to_test}=}"
 		if bash__SupportsVariableReferences ; then
-			oResult="${lScriptArgWoOptionToTest}"
+			oResult="${l_script_arg_wo_option_to_test}"
 		else
-			eval $3=\$lScriptArgWoOptionToTest
+			eval $3=\$l_script_arg_wo_option_to_test
 		fi
-	else if [ "${xScriptArg}" = "--${xOptionToTest}" ] ; then
+	else if [ "${i_script_arg}" = "--${i_option_to_test}" ] ; then
 		if bash__SupportsVariableReferences ; then
-			oResult="${xOptionToTest}"
+			oResult="${i_option_to_test}"
 		else
-			eval $3=\$xOptionToTest
+			eval $3=\$i_option_to_test
 		fi
 	else
 		echo "nothing :-("
 	fi ; fi
 }
 
-xModusOperandi=svn
+i_modus_operandi=svn
 for l_arg in "$@" ; do
-	set_arg "${l_arg}" "svn" xModusOperandi
-	set_arg "${l_arg}" "bzr" xModusOperandi
-	set_arg "${l_arg}" "git" xModusOperandi
+	set_arg "${l_arg}" "svn" i_modus_operandi
+	set_arg "${l_arg}" "bzr" i_modus_operandi
+	set_arg "${l_arg}" "git" i_modus_operandi
 
-	set_arg "${l_arg}" "mine" xMine
-	set_arg "${l_arg}" "theirs" xTheirs
-	set_arg "${l_arg}" "base" xBase
-	set_arg "${l_arg}" "result" xResult
+	set_arg "${l_arg}" "mine" i_mine
+	set_arg "${l_arg}" "theirs" i_theirs
+	set_arg "${l_arg}" "base" i_base
+	set_arg "${l_arg}" "result" i_result
 
-	set_arg "${l_arg}" "working" xMine
-	set_arg "${l_arg}" "right" xTheirs
-	set_arg "${l_arg}" "left" xBase
-	set_arg "${l_arg}" "merged" xResult
+	set_arg "${l_arg}" "working" i_mine
+	set_arg "${l_arg}" "right" i_theirs
+	set_arg "${l_arg}" "left" i_base
+	set_arg "${l_arg}" "merged" i_result
 done
 
-xMine="${xMine:-}"
-xTheirs="${xTheirs:-}"
-xResult="${xResult:-}"
-xBase="${xBase:-}"
+i_mine="${i_mine:-}"
+i_theirs="${i_theirs:-}"
+i_result="${i_result:-}"
+i_base="${i_base:-}"
 
 # -------------------------------------------------------------------------------------------------
 
-if [ -z "${xTheirs}" -o -z "${xResult}" ] ; then
+if [ -z "${i_theirs}" -o -z "${i_result}" ] ; then
 	echo Options:
 	echo "	--theirs=<file>"
+	echo "		mandatory"
 	echo "	--mine=<file>"
 	echo "	--base=<file>"
 	echo "	--result=<file>"
-	echo "	--left=<file> ... alias for --base for SVN conflict merges"
-	echo "	--right=<file> ... alias for --theirs for SVN conflict merges"
-	echo "	--working=<file> ... alias for --mine for SVN conflict merges"
-	echo "	--merged=<file> ... alias for --result for SVN conflict merges"
+	echo "		mandatory"
+	echo "	--left=<file>"
+	echo "		alias for --base for SVN conflict merges"
+	echo "	--right=<file>"
+	echo "		alias for --theirs for SVN conflict merges"
+	echo "	--working=<file>"
+	echo "		alias for --mine for SVN conflict merges"
+	echo "	--merged=<file>"
+	echo "		alias for --result for SVN conflict merges"
 	exit
 fi
 
-if [ -n "${xMine}" ] ; then
-	tmpMine=$( echo "${xMine}.mine.tmp" | tr ' !@#$%^&*()+' '____________' )
+if [ -n "${i_mine}" ] ; then
+	l_tmp_mine=$( echo "${i_mine}.mine.tmp" | tr ' !@#$%^&*()+' '____________' )
 
-	echo "Preprocessing 'mine' ${xMine} -> ${tmpMine}"
-	decryptProjectFile "${xMine}" "${tmpMine}"
+	echo "Preprocessing 'mine' ${i_mine} -> ${l_tmp_mine}"
+	decryptProjectFile "${i_mine}" "${l_tmp_mine}"
 fi
 
-if [ -n "${xTheirs}" ] ; then
-	tmpTheirs=$( echo "${xTheirs}.theirs.tmp" | tr ' !@#$%^&*()+' '____________' )
+if [ -n "${i_theirs}" ] ; then
+	l_tmp_theirs=$( echo "${i_theirs}.theirs.tmp" | tr ' !@#$%^&*()+' '____________' )
 
-	echo "Preprocessing 'theirs' ${xTheirs} -> ${tmpTheirs}"
-	decryptProjectFile "${xTheirs}" "${tmpTheirs}"
+	echo "Preprocessing 'theirs' ${i_theirs} -> ${l_tmp_theirs}"
+	decryptProjectFile "${i_theirs}" "${l_tmp_theirs}"
 fi
 
-if [ -n "${xBase}" ] ; then
-	tmpBase=$( echo "${xBase}.base.tmp" | tr ' !@#$%^&*()+' '____________' )
+if [ -n "${i_base}" ] ; then
+	l_tmp_base=$( echo "${i_base}.base.tmp" | tr ' !@#$%^&*()+' '____________' )
 
-	echo "Preprocessing 'base' ${xBase} -> ${tmpBase}"
-	decryptProjectFile "${xBase}" "${tmpBase}"
+	echo "Preprocessing 'base' ${i_base} -> ${l_tmp_base}"
+	decryptProjectFile "${i_base}" "${l_tmp_base}"
 else
-	tmpBase=
+	l_tmp_base=
 fi
 
-if [ -n "${xResult}" ] ; then
-	tmpResult=$(echo "${xResult}.merged.tmp" | tr ' !@#$%^&*()+' '____________' )
+if [ -n "${i_result}" ] ; then
+	l_tmp_result=$(echo "${i_result}.merged.tmp" | tr ' !@#$%^&*()+' '____________' )
 else
-	tmpResult=
+	l_tmp_result=
 fi
 
 echo "Running TortoiseMerge"
-echo "    mine = ${tmpMine}"
-echo "    theirs = ${tmpTheirs}"
-echo "    base = ${tmpBase}"
-echo "    merged = ${tmpResult}"
+echo "    mine = ${l_tmp_mine}"
+echo "    theirs = ${l_tmp_theirs}"
+echo "    base = ${l_tmp_base}"
+echo "    merged = ${l_tmp_result}"
 
-if [ -n "${tmpBase}" ] ; then
+if [ -n "${l_tmp_base}" ] ; then
 	echo "    (processing branch #1)"
-	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpBase} /merged:${tmpResult}
+	"${TortoiseMergeBinary}" /mine:${l_tmp_mine} /theirs:${l_tmp_theirs} /base:${l_tmp_base} /merged:${l_tmp_result}
 	l_merge_return=$?
-else if [ -n "${tmpResult}" ] ; then
+else if [ -n "${l_tmp_result}" ] ; then
 	echo "    (processing branch #2)"
-	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpMine} /merged:${tmpResult}
+	"${TortoiseMergeBinary}" /mine:${l_tmp_mine} /theirs:${l_tmp_theirs} /base:${l_tmp_mine} /merged:${l_tmp_result}
 	l_merge_return=$?
 else
 	echo "    (processing branch ELSE)"
-	"${TortoiseMergeBinary}" ${tmpTheirs} ${tmpMine}
+	"${TortoiseMergeBinary}" ${l_tmp_theirs} ${l_tmp_mine}
 	l_merge_return=$?
-	xResult="${xMine}"
-	tmpResult="${tmpMine}"
+	i_result="${i_mine}"
+	l_tmp_result="${l_tmp_mine}"
 fi ; fi
 
 if [ "${l_merge_return}" -eq 0 ] ; then
-	echo "Postprocessing merge result ${tmpResult} -> ${xResult}"
-	gawk -f "${LibPath}/_pldev_proj_encrypt_groups.awk" < "${tmpResult}" > "${xResult}"
+	echo "Postprocessing merge result ${l_tmp_result} -> ${i_result}"
+	gawk -f "${LibPath}/_pldev_proj_encrypt_groups.awk" < "${l_tmp_result}" > "${i_result}"
 else
 	echo "Merge aborted/failed; no postprocessing taking place!"
 fi
 
 echo "Cleaning up the temps"
-[ -f "${tmpMine}" ] && rm -f "${tmpMine}"
-[ -f "${tmpTheirs}" ] && rm -f "${tmpTheirs}"
-[ -f "${tmpBase}" ] && rm -f "${tmpBase}"
-[ -f "${tmpResult}" ] && rm -f "${tmpResult}"
+[ -f "${l_tmp_mine}" ] && rm -f "${l_tmp_mine}"
+[ -f "${l_tmp_theirs}" ] && rm -f "${l_tmp_theirs}"
+[ -f "${l_tmp_base}" ] && rm -f "${l_tmp_base}"
+[ -f "${l_tmp_result}" ] && rm -f "${l_tmp_result}"
