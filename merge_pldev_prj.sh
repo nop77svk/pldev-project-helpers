@@ -159,18 +159,25 @@ echo "    merged = ${tmpResult}"
 if [ -n "${tmpBase}" ] ; then
 	echo "    (processing branch #1)"
 	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpBase} /merged:${tmpResult}
+	l_merge_return=$?
 else if [ -n "${tmpResult}" ] ; then
 	echo "    (processing branch #2)"
 	"${TortoiseMergeBinary}" /mine:${tmpMine} /theirs:${tmpTheirs} /base:${tmpMine} /merged:${tmpResult}
+	l_merge_return=$?
 else
 	echo "    (processing branch ELSE)"
 	"${TortoiseMergeBinary}" ${tmpTheirs} ${tmpMine}
+	l_merge_return=$?
 	xResult="${xMine}"
 	tmpResult="${tmpMine}"
 fi ; fi
 
-echo "Postprocessing merge result ${tmpResult} -> ${xResult}"
-gawk -f "${LibPath}/_pldev_proj_encrypt_groups.awk" < "${tmpResult}" > "${xResult}"
+if [ "${l_merge_return}" -eq 0 ] ; then
+	echo "Postprocessing merge result ${tmpResult} -> ${xResult}"
+	gawk -f "${LibPath}/_pldev_proj_encrypt_groups.awk" < "${tmpResult}" > "${xResult}"
+else
+	echo "Merge aborted/failed; no postprocessing taking place!"
+fi
 
 echo "Cleaning up the temps"
 [ -f "${tmpMine}" ] && rm -f "${tmpMine}"
