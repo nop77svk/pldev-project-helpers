@@ -6,11 +6,12 @@ set -o nounset
 set -o pipefail
 [ -n "${DEBUG:=}" ] && set -x # xtrace
 
-Here=$PWD
+Here="$PWD"
 FullScriptPath=$( echo "$0" | sed 's/\\/\//g' | sed 's/\([a-z]\):/\/cygdrive\/\1/gi' )
 ScriptPath=$( dirname "${FullScriptPath}" )
 cd "${ScriptPath}"
-ScriptPath=$PWD
+ScriptPath="$PWD"
+LibPath="${ScriptPath}/lib"
 cd "${Here}"
 TmpPath="${Here}"
 
@@ -23,23 +24,25 @@ for prjFile in *.prj ; do
 	echo "Now checking project file ${prjFile}" >&2
 
 	echo "    Spooling the list of files in PRJ" >&2
-	gawk '
-		BEGIN {
-			doSpool = 0;
-		}
-
-		$0 ~/^[[:space:]]*\[.*\][[:space:]]*$/ {
-			doSpool = 0;
-		}
-
-		doSpool == 1 {
-			print;
-		}
-
-		$0 ~/^[[:space:]]*\[Files\][[:space:]]*$/ {
-			doSpool = 1;
-		}
-	' "${Here}/${prjFile}" \
+	cat "${Here}/${prjFile}" \
+		| dos2unix \
+		| gawk '
+			BEGIN {
+				doSpool = 0;
+			}
+	
+			$0 ~/^[[:space:]]*\[.*\][[:space:]]*$/ {
+				doSpool = 0;
+			}
+	
+			doSpool == 1 {
+				print;
+			}
+	
+			$0 ~/^[[:space:]]*\[Files\][[:space:]]*$/ {
+				doSpool = 1;
+			}
+		' \
 		| sed 's/^[^,]*,[^,]*,[^,]*,[^,]*,\s*\(.*\)\s*$/\1/gi' \
 		| grep -Ev '^\s*$' \
 		| tr '[:upper:]' '[:lower:]' \
@@ -72,7 +75,7 @@ for prjFile in *.prj ; do
 		> "${TmpPath}/extra_PRJ_items.${RndToken}.tmp"
 
 	echo "    Decrypting project's file groups"
-	gawk -f "${ScriptPath}/_pldev_proj_decrypt_groups.awk" "${prjFile}" > "${TmpPath}/${prjFile}.${RndToken}.base.tmp"
+	gawk -f "${LibPath}/_pldev_proj_decrypt_groups.awk" "${prjFile}" > "${TmpPath}/${prjFile}.${RndToken}.base.tmp"
 
 	echo "    Removing extra project items"
 	grep -Fv --file="${TmpPath}/extra_PRJ_items.${RndToken}.tmp" "${TmpPath}/${prjFile}.${RndToken}.base.tmp" > "${TmpPath}/${prjFile}.${RndToken}.no_extra_items.tmp"
@@ -107,7 +110,7 @@ for prjFile in *.prj ; do
 		> "${TmpPath}/${prjFile}.${RndToken}.synced.tmp"
 
 	echo "    Encrypting project's file groups"
-	gawk -f "${ScriptPath}/_pldev_proj_encrypt_groups.awk" "${TmpPath}/${prjFile}.${RndToken}.synced.tmp" \
+	gawk -f "${LibPath}/_pldev_proj_encrypt_groups.awk" "${TmpPath}/${prjFile}.${RndToken}.synced.tmp" \
 		> "${TmpPath}/${prjFile}.${RndToken}.new"
 done
 
