@@ -39,7 +39,7 @@ TortoiseMergeBinary=tmerge.exe
 xTheirs="${1:-}"
 if [ -z "${xTheirs}" ] ; then
 	echo Usage 1:
-	echo "    \"${FullScriptPath}\" <theirs/left> <mine/right> [<working/base>] <merged/result>"
+	echo "    \"${FullScriptPath}\" <theirs/right> <mine/working> [<base/left>] <result/merged>"
 	echo Usage 2:
 	echo "    \"${FullScriptPath}\" <theirs/left> <mine/right/merged/result>"
 	exit
