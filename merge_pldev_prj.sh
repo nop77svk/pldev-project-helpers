@@ -79,8 +79,6 @@ function set_arg()
 		else
 			eval $3=\$i_option_to_test
 		fi
-	else
-		echo "nothing :-("
 	fi ; fi
 }
 
