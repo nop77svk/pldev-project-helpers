@@ -109,21 +109,17 @@ i_base="${i_base:-}"
 # -------------------------------------------------------------------------------------------------
 
 if [ -z "${i_theirs}" -o -z "${i_result}" ] ; then
-	echo Options:
-	echo "	--theirs=<file>"
-	echo "		mandatory"
-	echo "	--mine=<file>"
-	echo "	--base=<file>"
-	echo "	--result=<file>"
-	echo "		mandatory"
-	echo "	--left=<file>"
-	echo "		alias for --base for SVN conflict merges"
-	echo "	--right=<file>"
-	echo "		alias for --theirs for SVN conflict merges"
-	echo "	--working=<file>"
-	echo "		alias for --mine for SVN conflict merges"
-	echo "	--merged=<file>"
-	echo "		alias for --result for SVN conflict merges"
+	cat <<-EOF
+		Options:
+		    --theirs=<file>     mandatory at least
+		    --mine=<file>
+		    --base=<file>
+		    --result=<file>     mandatory at least
+		    --left=<file>       alias for --base for SVN conflict merges
+		    --right=<file>      alias for --theirs for SVN conflict merges
+		    --working=<file>    alias for --mine for SVN conflict merges
+		    --merged=<file>     alias for --result for SVN conflict merges
+		EOF
 	exit
 fi
 
