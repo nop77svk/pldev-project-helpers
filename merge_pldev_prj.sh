@@ -18,6 +18,27 @@ TmpPath="${Here}"
 DateTimeToken=$( date +%Y%m%d-%H%M%S )
 RndToken=${DateTimeToken}-${RANDOM}
 
+# ------------------------------------------------------------------------------------------------
+
+function bash__VersionIsAtLeast()
+{
+	local bashMajorVersion=${BASH_VERSION%%.*}
+	local bashMinorVersion=${BASH_VERSION#*.}
+	local bashMinorVersion=${bashMinorVersion%%.*}
+
+	local targetMajorVersion=$1
+	local targetMinorVersion=$2
+
+	[ ${bashMajorVersion} -gt ${targetMajorVersion} -o ${bashMajorVersion} -eq ${targetMajorVersion} -a ${bashMinorVersion} -ge ${targetMinorVersion} ]
+}
+
+function bash__SupportsVariableReferences()
+{
+	bash__VersionIsAtLeast 4 3
+}
+
+# ------------------------------------------------------------------------------------------------
+
 function decryptProjectFile()
 {
 	local i_input_file=$1
@@ -35,27 +56,70 @@ function decryptProjectFile()
 TortoiseMergeBinary=tmerge.exe
 
 # -------------------------------------------------------------------------------------------------
+# read command line arguments...
 
-xTheirs="${1:-}"
-if [ -z "${xTheirs}" ] ; then
-	echo Usage 1:
-	echo "    \"${FullScriptPath}\" <theirs/right> <mine/working> [<base/left>] <result/merged>"
-	echo Usage 2:
-	echo "    \"${FullScriptPath}\" <theirs/left> <mine/right/merged/result>"
+function set_arg()
+{
+	xScriptArg="$1"
+	xOptionToTest="$2"
+	if bash__SupportsVariableReferences ; then
+		declare -n oResult=$3
+	fi
+
+	if [[ "${xScriptArg}" == "--${xOptionToTest}="* ]] ; then
+		lScriptArgWoOptionToTest="${xScriptArg#--${xOptionToTest}=}"
+		if bash__SupportsVariableReferences ; then
+			oResult="${lScriptArgWoOptionToTest}"
+		else
+			eval $3=\$lScriptArgWoOptionToTest
+		fi
+	else if [ "${xScriptArg}" = "--${xOptionToTest}" ] ; then
+		if bash__SupportsVariableReferences ; then
+			oResult="${xOptionToTest}"
+		else
+			eval $3=\$xOptionToTest
+		fi
+	else
+		echo "nothing :-("
+	fi ; fi
+}
+
+xModusOperandi=svn
+for l_arg in "$@" ; do
+	set_arg "${l_arg}" "svn" xModusOperandi
+	set_arg "${l_arg}" "bzr" xModusOperandi
+	set_arg "${l_arg}" "git" xModusOperandi
+
+	set_arg "${l_arg}" "mine" xMine
+	set_arg "${l_arg}" "theirs" xTheirs
+	set_arg "${l_arg}" "base" xBase
+	set_arg "${l_arg}" "result" xResult
+
+	set_arg "${l_arg}" "working" xMine
+	set_arg "${l_arg}" "right" xTheirs
+	set_arg "${l_arg}" "left" xBase
+	set_arg "${l_arg}" "merged" xResult
+done
+
+xMine="${xMine:-}"
+xTheirs="${xTheirs:-}"
+xResult="${xResult:-}"
+xBase="${xBase:-}"
+
+# -------------------------------------------------------------------------------------------------
+
+if [ -z "${xTheirs}" -o -z "${xResult}" ] ; then
+	echo Options:
+	echo "	--theirs=<file>"
+	echo "	--mine=<file>"
+	echo "	--base=<file>"
+	echo "	--result=<file>"
+	echo "	--left=<file> ... alias for --base for SVN conflict merges"
+	echo "	--right=<file> ... alias for --theirs for SVN conflict merges"
+	echo "	--working=<file> ... alias for --mine for SVN conflict merges"
+	echo "	--merged=<file> ... alias for --result for SVN conflict merges"
 	exit
 fi
-
-xMine="$2"
-if [ -n "${4:-}" ] ; then
-	xResult="${4}"
-	xBase="${3}"
-else if [ -n "${3:-}" ] ; then
-	xResult="${3}"
-	xBase=
-else
-	xResult=
-	xBase=
-fi ; fi
 
 if [ -n "${xMine}" ] ; then
 	tmpMine=$( echo "${xMine}.mine.tmp" | tr ' !@#$%^&*()+' '____________' )
